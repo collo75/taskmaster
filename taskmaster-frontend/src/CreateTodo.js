@@ -1,22 +1,41 @@
 import React, { useState } from 'react';
 
-function CreateTodo() {
-    const [title, setTitle] = useState('');
+function CreateTodo({ onTodoCreated }) {
+    // Initialize state as an object with both fields
+    const [todo, setTodo] = useState({
+        title: '',
+        description: '',
+    });
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    // Update state for each field
+    const handleChange = (event) => {
+        const { name, value } = event.target;
+        setTodo(prevTodo => ({
+            ...prevTodo,
+            [name]: value,
+        }));
+    };
 
+    // Handle form submission
+    const handleSubmit = (event) => {
+        event.preventDefault();
         fetch('http://localhost:8000/api/todos/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ title, completed: false })
+            body: JSON.stringify(todo),
         })
             .then(response => response.json())
             .then(data => {
                 console.log('Success:', data);
-                setTitle(''); // Reset title for next input
+                // Clear form or handle success (e.g., update TodoList)
+                setTodo({
+                    title: '',
+                    description: '',
+                });
+                // Now call onTodoCreated to refresh the todo list
+                onTodoCreated();
             })
             .catch((error) => {
                 console.error('Error:', error);
@@ -25,13 +44,26 @@ function CreateTodo() {
 
     return (
         <form onSubmit={handleSubmit}>
-            <input
-                type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Add a new todo"
-            />
-            <button type="submit">Submit</button>
+            <label>
+                Title:
+                <input
+                    type="text"
+                    name="title"
+                    value={todo.title}
+                    onChange={handleChange}
+                />
+            </label>
+            <br />
+            <label>
+                Description:
+                <textarea
+                    name="description"
+                    value={todo.description}
+                    onChange={handleChange}
+                />
+            </label>
+            <br />
+            <button type="submit">Add Todo</button>
         </form>
     );
 }

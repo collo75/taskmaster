@@ -1,15 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 
-function TodoList() {
-    const [todos, setTodos] = useState([]);
-
-    useEffect(() => {
-        fetch('http://localhost:8000/api/todos/')
-            .then(response => response.json())
-            .then(data => setTodos(data))
-            .catch(error => console.error('Error fetching data: ', error));
-    }, []);
-
+function TodoList({ todos }) {
     return (
         <div>
             <h2>Todo List</h2>
